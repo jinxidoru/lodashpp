@@ -1,9 +1,13 @@
+#define LD_MACROS_ENABLED
 #include "./lodashpp.hpp"
 #include <iostream>
+
 
 using lodashpp::_;
 using std::cout;
 using std::endl;
+using std::string;
+
 
 namespace std {
 
@@ -48,6 +52,26 @@ bool test( int lineNo, T const& a, T const& b) {
   }
 }
 
+struct Person {
+  int id;
+  string name;
+  std::vector<int> childIds;
+
+  auto getName() { return name; }
+
+  Person( int id_, string name_, std::vector<int> const& childIds_ )
+  : id(id_), name(name_), childIds(childIds_) {}
+
+  Person( Person&& rhs )
+  : id(rhs.id), name(rhs.name), childIds(std::move(rhs.childIds)) {}
+
+  //! NOTE: we do this to make sure that we're not performing unnecessary copies along the pipeline.
+  Person( Person const& ) = delete;
+};
+
+
+
+// ---- tests ----
 
 void test_stl_drain() {
   const std::vector<int> nums = { 1, 2, 3, 4 };
@@ -62,12 +86,29 @@ void test_stl_drain() {
   test(__LINE__, (std::vector<int64_t>)gen, {8,16,24,32});
 }
 
+void test_pluck() {
+  std::list<Person> people;
+  people.push_back(Person{1, "Michael", {2,3}});
+  people.push_back({ 2, "Jessica", {4} });
+  people.push_back({ 3, "Edward", {} });
+  people.push_back({ 4, "Jonathan", {} });
+
+  test(__LINE__, _(people).pluck(&Person::id).vector(), {1,2,3,4});
+  test(__LINE__, _(people).pluck(&Person::getName).vector(),
+    {"Michael","Jessica","Edward","Jonathan"});
+  test(__LINE__, _(people).map(LD_PROP(id)).vector(), {1,2,3,4});
+  test(__LINE__, _(people).map(LD_PROP(name)).vector(), {"Michael","Jessica","Edward","Jonathan"});
+  test(__LINE__, _(people).pluck(LD_PROP(id)).vector(), {1,2,3,4});
+  test(__LINE__, _(people).pluck(&Person::id).map([](int v) { return v*2; }).vector(), {2,4,6,8});
+}
+
 
 
 int main() {
 
   // run the tests
   test_stl_drain();
+  test_pluck();
 
   // show the results
   cout << endl;

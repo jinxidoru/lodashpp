@@ -31,6 +31,13 @@ SOFTWARE.
 #include <vector>
 #include <list>
 
+// ---- macros ----
+
+#if defined(LD_MACROS_ENABLED)
+  #define LD_PROP(name)     [](auto&& v) { return v.name; }
+  #define LD_PROP_PTR(name) [](auto&& v) { return v->name; }
+#endif
+
 
 namespace lodashpp {
 
@@ -66,6 +73,19 @@ namespace lodashpp {
         });
       });
     }
+
+    //! Returns the given field from each item.
+    template <class U, class C> auto pluck( U C::*fptr ) {
+      return map([=](auto&& v) { return v.*fptr; });
+    }
+
+    //! Returns the result of the given function from each item.
+    template <class U, class C> auto pluck( U (C::*fptr)() ) {
+      return map([=](auto&& v) { return (v.*fptr)(); });
+    }
+
+    //! Alias for map().  This is typically used with LD_PROP().
+    template <class Fn> auto pluck( Fn&& fn ) { return map(fn); }
 
 
     // ---- drain functions ----
