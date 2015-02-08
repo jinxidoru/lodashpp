@@ -74,7 +74,7 @@ struct Person {
 // ---- tests ----
 
 void test_stl_drain() {
-  const std::vector<int> nums = { 1, 2, 3, 4 };
+  std::vector<int> const nums = { 1, 2, 3, 4 };
   auto gen = _(nums)
     .map([](auto&& v) { return v*.2; })
     .map([](auto&& v) -> int { return v*40; });
@@ -102,6 +102,23 @@ void test_pluck() {
   test(__LINE__, _(people).pluck(&Person::id).map([](int v) { return v*2; }).vector(), {2,4,6,8});
 }
 
+void test_every() {
+  std::vector<int> const nums = {1,2,3,4};
+  int n=0;
+  auto count = [&](auto&&) { n++; };
+  auto reset = [&]() { auto x=n; n=0; return x; };
+
+  test(__LINE__, _(nums).peek(count).every([](auto&& v) { return v>1; }), false);
+  test(__LINE__, _(nums).all([](auto&& v) { return v>1; }), false);
+  test(__LINE__, reset(), 1);
+
+  test(__LINE__, _(nums).peek(count).every([](auto&& v) { return v>0; }), true);
+  test(__LINE__, reset(), 4);
+
+  test(__LINE__, _(nums).peek(count).every([](auto&& v) { return v<3; }), false);
+  test(__LINE__, reset(), 3);
+}
+
 
 
 int main() {
@@ -109,6 +126,7 @@ int main() {
   // run the tests
   test_stl_drain();
   test_pluck();
+  test_every();
 
   // show the results
   cout << endl;

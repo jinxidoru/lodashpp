@@ -87,6 +87,39 @@ namespace lodashpp {
     //! Alias for map().  This is typically used with LD_PROP().
     template <class Fn> auto pluck( Fn&& fn ) { return map(fn); }
 
+    //! Returns true if every item evaluates to true.
+    template <class Fn> bool every( Fn&& fn ) {
+      bool rval = true;
+      m_gen([&](auto&& v) {
+        if ( !fn(v) ) {
+          rval = false;
+          return false;
+        } else {
+          return true;
+        }
+      });
+      return rval;
+    }
+
+    //! Same as each(), but does not stop the pipeline.
+    template <class Fn> auto peek( Fn&& fn ) {
+      return link<T>([=](auto&& next) {
+        m_gen([=](auto&& v) {
+          fn(v);
+          return next(v);
+        });
+      });
+    }
+
+
+    // ---- aliases ----
+    #define LD_ALIAS_FN(from,to) \
+      template <class... Ts> auto from(Ts&&... args) { return to(std::forward<Ts>(args)...); }
+
+    LD_ALIAS_FN(all,every);
+
+    #undef LD_ALIAS_FN
+
 
     // ---- drain functions ----
     //! Call this function for each item.
