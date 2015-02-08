@@ -1,3 +1,8 @@
+.*
+!.gitignore
+/lodash_tests
+
+
 # Compiled Object files
 *.slo
 *.lo
