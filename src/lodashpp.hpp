@@ -34,8 +34,11 @@ SOFTWARE.
 // ---- macros ----
 
 #if defined(LD_MACROS_ENABLED)
-  #define LD_PROP(name)     [](auto&& v) { return v.name; }
-  #define LD_PROP_PTR(name) [](auto&& v) { return v->name; }
+  #define LD_FN(v)          [](auto&& v)
+  #define LD_EXPR2(v,expr)  LD_FN(v) { return expr; }
+  #define LD_EXPR(expr)     LD_EXPR2(v,expr)
+  #define LD_PROP(name)     LD_FN(v) { return v.name; }
+  #define LD_PROP_PTR(name) LD_FN(v) { return v->name; }
 #endif
 
 

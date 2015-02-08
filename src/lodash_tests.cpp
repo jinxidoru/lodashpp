@@ -116,6 +116,7 @@ void test_every_and_some() {
   test(__LINE__, reset(), 4);
 
   test(__LINE__, _(nums).peek(count).every([](auto&& v) { return v<3; }), false);
+  test(__LINE__, _(nums).every(LD_EXPR(v<3)), false);
   test(__LINE__, reset(), 3);
 
   test(__LINE__, _(nums).peek(count).some([](auto&& v) { return v==3; }), true);
