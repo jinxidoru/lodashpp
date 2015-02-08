@@ -132,6 +132,7 @@ namespace lodashpp {
 
     LD_ALIAS_FN(all,every);
     LD_ALIAS_FN(any,some);
+    LD_ALIAS_FN(collect,map);
 
     #undef LD_ALIAS_FN
 

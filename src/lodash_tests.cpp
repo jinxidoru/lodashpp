@@ -96,7 +96,7 @@ void test_pluck() {
   test(__LINE__, _(people).pluck(&Person::id).vector(), {1,2,3,4});
   test(__LINE__, _(people).pluck(&Person::getName).vector(),
     {"Michael","Jessica","Edward","Jonathan"});
-  test(__LINE__, _(people).map(LD_PROP(id)).vector(), {1,2,3,4});
+  test(__LINE__, _(people).collect(LD_PROP(id)).vector(), {1,2,3,4});
   test(__LINE__, _(people).map(LD_PROP(name)).vector(), {"Michael","Jessica","Edward","Jonathan"});
   test(__LINE__, _(people).pluck(LD_PROP(id)).vector(), {1,2,3,4});
   test(__LINE__, _(people).pluck(&Person::id).map([](int v) { return v*2; }).vector(), {2,4,6,8});
