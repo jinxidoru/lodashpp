@@ -127,6 +127,15 @@ void test_every_and_some() {
   test(__LINE__, reset(), 4);
 }
 
+void test_filter() {
+  std::vector<string> const strs = {"aa","ab","ba","bb"};
+  auto root = _(strs);
+
+  test(__LINE__, root.filter(LD_EXPR(v.find('a') != string::npos)).list(), {"aa","ab","ba"});
+  test(__LINE__, root.filter(LD_EXPR(v.find('b') != string::npos)).list(), {"ab","ba","bb"});
+  test(__LINE__, root.filter(LD_EXPR(v.find_last_of('a') == 1)).list(), {"aa","ba"});
+}
+
 
 int main() {
 
@@ -134,6 +143,7 @@ int main() {
   test_stl_drain();
   test_pluck();
   test_every_and_some();
+  test_filter();
 
   // show the results
   cout << endl;

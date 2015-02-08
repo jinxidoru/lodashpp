@@ -128,6 +128,17 @@ namespace lodashpp {
       });
     }
 
+    //! Filters out all values that do not match the given predicate.
+    template <class Fn> auto filter( Fn&& fn ) {
+      return link<T>([=](auto&& next) {
+        m_gen([=](auto&& v) {
+          if ( fn(v) )
+            next(v);
+          return true;
+        });
+      });
+    }
+
 
     // ---- aliases ----
     #define LD_ALIAS_FN(from,to) \
