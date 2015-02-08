@@ -102,7 +102,7 @@ void test_pluck() {
   test(__LINE__, _(people).pluck(&Person::id).map([](int v) { return v*2; }).vector(), {2,4,6,8});
 }
 
-void test_every() {
+void test_every_and_some() {
   std::vector<int> const nums = {1,2,3,4};
   int n=0;
   auto count = [&](auto&&) { n++; };
@@ -117,8 +117,14 @@ void test_every() {
 
   test(__LINE__, _(nums).peek(count).every([](auto&& v) { return v<3; }), false);
   test(__LINE__, reset(), 3);
-}
 
+  test(__LINE__, _(nums).peek(count).some([](auto&& v) { return v==3; }), true);
+  test(__LINE__, _(nums).any([](auto&& v) { return v==3; }), true);
+  test(__LINE__, reset(), 3);
+
+  test(__LINE__, _(nums).peek(count).some([](auto&& v) { return v>4; }), false);
+  test(__LINE__, reset(), 4);
+}
 
 
 int main() {
@@ -126,7 +132,7 @@ int main() {
   // run the tests
   test_stl_drain();
   test_pluck();
-  test_every();
+  test_every_and_some();
 
   // show the results
   cout << endl;

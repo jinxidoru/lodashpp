@@ -101,6 +101,20 @@ namespace lodashpp {
       return rval;
     }
 
+    //! Returns true if at least one item evaluates to true.
+    template <class Fn> bool some( Fn&& fn ) {
+      bool rval = false;
+      m_gen([&](auto&& v) {
+        if ( fn(v) ) {
+          rval = true;
+          return false;
+        } else {
+          return true;
+        }
+      });
+      return rval;
+    }
+
     //! Same as each(), but does not stop the pipeline.
     template <class Fn> auto peek( Fn&& fn ) {
       return link<T>([=](auto&& next) {
@@ -117,6 +131,7 @@ namespace lodashpp {
       template <class... Ts> auto from(Ts&&... args) { return to(std::forward<Ts>(args)...); }
 
     LD_ALIAS_FN(all,every);
+    LD_ALIAS_FN(any,some);
 
     #undef LD_ALIAS_FN
 
