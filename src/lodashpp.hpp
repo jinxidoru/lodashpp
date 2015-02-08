@@ -27,7 +27,9 @@ SOFTWARE.
 
 #include <type_traits>
 #include <functional>
+#include <iterator>
 #include <vector>
+#include <list>
 
 
 namespace lodashpp {
@@ -45,7 +47,7 @@ namespace lodashpp {
   template <class T, class GenFn>
   struct Generator {
     typedef T ValueType;
-    typedef typename std::remove_reference_t<std::remove_cv_t<T>> BaseValueType;
+    typedef typename std::remove_reference_t<std::remove_cv_t<T>> BaseValue;
 
     Generator( GenFn&& gen ) : m_gen(gen) {}
 
@@ -65,19 +67,41 @@ namespace lodashpp {
       });
     }
 
-    auto vtr() {
-      std::vector<BaseValueType> rval;
-      m_gen([&](auto&& v) {
-        rval.push_back(v);
-        return true;
+
+    // ---- drain functions ----
+    //! Call this function for each item.
+    template <class Fn> void each( Fn&& fn ) {
+      m_gen([&](auto&& v) { fn(v); return true; });
+    }
+
+    //! Drain all of the items into the provided output iterator.
+    template <class OutIter> OutIter drain( OutIter out ) {
+      each([&](auto&& v) {
+        *out = v;
+        ++out;
       });
+      return out;
+    }
+
+    //! Convert to a vector.
+    template <class U> operator std::vector<U>() {
+      std::vector<U> rval;
+      drain(std::back_inserter(rval));
       return rval;
     }
 
-    template <class Fn>
-    void each( Fn&& fn ) {
-      m_gen(fn);
+    //! Convert to a list.
+    template <class U> operator std::list<U>() {
+      std::list<U> rval;
+      drain(std::back_inserter(rval));
+      return rval;
     }
+
+
+    // ---- drain aliases ----
+    std::vector<BaseValue> vector() { return *this; }
+    std::list<BaseValue> list() { return *this; }
+
 
   private:
     GenFn m_gen;

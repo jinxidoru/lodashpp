@@ -23,25 +23,24 @@ namespace std {
   std::ostream& operator<<( std::ostream& out, std::vector<T> const& coll ) {
     return outp(out,coll.begin(),coll.end());
   }
-}
 
+  template <class T>
+  std::ostream& operator<<( std::ostream& out, std::list<T> const& coll ) {
+    return outp(out,coll.begin(),coll.end());
+  }
+}
 
 static int results_pass = 0;
 static int results_fail = 0;
 
-
-#define TEST(cond) \
-  if ( !(test cond) ) { \
-    std::cout << "failure on line #" << __LINE__ << std::endl; \
-  }
-
 template <class T>
-bool test( T const& a, T const& b) {
+bool test( int lineNo, T const& a, T const& b) {
   if ( a == b ) {
     results_pass++;
     return true;
   } else {
     results_fail++;
+    cout << "FAILURE ON LINE #" << lineNo << endl;
     cout << a << endl;
     cout << " DOES NOT MATCH " << endl;
     cout << b << endl;
@@ -50,14 +49,25 @@ bool test( T const& a, T const& b) {
 }
 
 
-int main() {
+void test_stl_drain() {
   const std::vector<int> nums = { 1, 2, 3, 4 };
   auto gen = _(nums)
-    .map([](auto&& v) { return v*2; })
-    .map([](auto&& v) { return v*4; });
+    .map([](auto&& v) { return v*.2; })
+    .map([](auto&& v) -> int { return v*40; });
 
-  TEST((nums,nums));
-  TEST((gen.vtr(),{8, 16, 24, 32}))
+  // run some tests
+  test(__LINE__, nums, nums);
+  test(__LINE__, gen.vector(), {8,16,24,32});
+  test(__LINE__, gen.list(), {8,16,24,32});
+  test(__LINE__, (std::vector<int64_t>)gen, {8,16,24,32});
+}
+
+
+
+int main() {
+
+  // run the tests
+  test_stl_drain();
 
   // show the results
   cout << endl;

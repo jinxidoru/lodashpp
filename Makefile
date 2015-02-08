@@ -6,7 +6,7 @@ check: lodash_tests
 	@echo; echo ' --== running tests ==--'
 	@./lodash_tests
 
-lodash_tests: src/lodash_tests.cpp
+lodash_tests: src/lodash_tests.cpp src/lodashpp.hpp
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
